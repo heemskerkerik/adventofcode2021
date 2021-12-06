@@ -11,9 +11,11 @@ let cycle (buckets: int64[]) =
 
     [|0..8|] |> Array.map getNewValueForIndex
 
+let discard f a _ = f a
+
 let runSimulation cycleCount =
-    let buckets = [|0..8|] |> Array.map (fun i -> parsedInput |> Seq.filter (fun t -> t = i) |> Seq.length |> int64)
-    let finalBuckets = [1..cycleCount] |> List.fold (fun b _ -> cycle b) buckets
+    let buckets = {0..8} |> Seq.map (fun i -> parsedInput |> Seq.filter ((=) i) |> Seq.length |> int64) |> Array.ofSeq
+    let finalBuckets = {1..cycleCount} |> Seq.fold (discard cycle) buckets
 
     printfn $"Fish after %d{cycleCount} days: %d{Array.sum finalBuckets}"
 
