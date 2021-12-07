@@ -9,7 +9,10 @@ let max = positions |> Array.max
 let fuelToMoveTo position =
     positions |> Array.map (fun p -> abs (p - position)) |> Array.sum
 
-let fuel, optimalPosition = {min..max} |> Seq.map (fun p -> (fuelToMoveTo p, p)) |> Seq.minBy fst
+let solve f =
+    {min..max} |> Seq.map (fun p -> (p, f p)) |> Seq.minBy fst
+
+let fuel, optimalPosition = solve fuelToMoveTo
 printfn $"Best position to move to: %d{optimalPosition} - costs %d{fuel} fuel"
 
 let rec triangular (n: int64): int64 =
@@ -36,5 +39,5 @@ let memoizedTriangular = memoize triangular
 let fuelToMoveToTriangular position =
     positions |> Array.map (fun p -> memoizedTriangular (abs (p - position) |> int64)) |> Array.sum
 
-let fuel', optimalPosition' = {min..max} |> Seq.map (fun p -> (fuelToMoveToTriangular p, p)) |> Seq.minBy fst
+let fuel', optimalPosition' = solve fuelToMoveToTriangular
 printfn $"Triangular, best position to move to: %d{optimalPosition'} - costs %d{fuel'} fuel"
