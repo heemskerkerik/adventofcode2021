@@ -97,8 +97,7 @@ let rec play getFinalBoard boards draws  =
     match winningBoard with
     | Some b -> (b, nextDraw)
     | None ->
-        let remainingBoards = playedBoards
-                              |> List.filter (isWinner >> not)
+        let remainingBoards = playedBoards |> List.filter (isWinner >> not)
         play getFinalBoard remainingBoards (List.tail draws)
 
 let playToWin = play firstWinningBoard

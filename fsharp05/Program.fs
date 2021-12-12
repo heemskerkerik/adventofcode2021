@@ -73,16 +73,16 @@ let printMap (occurrences: seq<int>) =
                    |> Array.take width
 
         let lineString = System.String.Join ("", line)
-        printfn "%s" lineString
+        printfn $"%s{lineString}"
 
 let horizontalOrVerticalDangerousPoints =
     occurrences horizontalOrVerticalLines
     |> Seq.filter (fun o -> o > 1)
     |> Seq.length
-printfn "Horizontal or vertical dangerous points: %d" horizontalOrVerticalDangerousPoints
+printfn $"Horizontal or vertical dangerous points: %d{horizontalOrVerticalDangerousPoints}"
 
 let dangerousPoints =
     occurrences lines
     |> Seq.filter (fun o -> o > 1)
     |> Seq.length
-printfn "Dangerous points: %d" dangerousPoints
+printfn $"Dangerous points: %d{dangerousPoints}"

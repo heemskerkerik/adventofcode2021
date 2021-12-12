@@ -2006,9 +2006,7 @@ let depths =
 let depthCount = Array.length depths
 
 let countIncreases items =
-    let count = Array.length items
-
-    Array.zip (Array.take (count - 1) items) (Array.skip 1 items)
+    Array.pairwise items
     |> Array.filter (Tuple2.fold (<=))
     |> Array.length
 

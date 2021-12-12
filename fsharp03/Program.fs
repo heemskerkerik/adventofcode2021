@@ -17,9 +17,9 @@ let getBits values = seq {
 
 let getCounts values =
     let counts = Array.countBy id values
-    let ones = Array.tryFind (fun pair -> (fst pair) = 1uy) counts
+    let ones = Array.tryFind (fun (v, _) -> v = 1uy) counts
                |> Option.defaultValue (1uy, 0)
-    let zeroes = Array.tryFind (fun pair -> (fst pair) = 0uy) counts
+    let zeroes = Array.tryFind (fun (v, _) -> v = 0uy) counts
                  |> Option.defaultValue (0uy, 0)
     (snd zeroes, snd ones)
 

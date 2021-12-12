@@ -7,10 +7,19 @@ type Octopus = {
     Flashed: bool
 }
 
+type Point = int * int
+
 type State = {
-    Octopuses: Octopus[][]
+    Octopuses: Map<Point, Octopus>
     FlashCount: int
 }
+
+let toMap (octopuses: Octopus[][]): Map<Point, Octopus> =
+    octopuses
+    |> Array.indexed
+    |> Array.map (fun (y, row) -> row |> Array.indexed |> Array.map (fun (x, octopus) -> ((x, y), octopus)))
+    |> Array.collect id
+    |> Map
 
 let octopuses =
     input
@@ -20,17 +29,15 @@ let octopuses =
                                          Flashed = false
                                      }))
     |> Array.transpose
+    |> toMap
 
-let maxY = octopuses.[0].Length - 1
-let maxX = octopuses.Length - 1
-
-let mapAll f =
-    Array.map (fun row -> row |> Array.map f)
+let maxY = input.[0].Length - 1
+let maxX = input.Length - 1
 
 let incrementEnergyLevels =
-    mapAll (fun o -> { o with EnergyLevel = o.EnergyLevel + 1uy; Flashed = false })
+    Map.map (fun _ o -> { o with EnergyLevel = o.EnergyLevel + 1uy; Flashed = false })
 
-let rec flash (octopuses: Octopus[][]) =
+let rec flash (octopuses: Map<Point, Octopus>) =
     let mutable newOctopuses = octopuses
 
     let neighbors (x, y) =
@@ -46,46 +53,34 @@ let rec flash (octopuses: Octopus[][]) =
         }
         |> List.ofSeq
 
-    let rec flashOctopus (x, y) =
-        if newOctopuses.[x].[y].Flashed then
+    let rec flashOctopus point =
+        if newOctopuses.[point].Flashed then
             ()
         else
-            newOctopuses.[x].[y] <- { newOctopuses.[x].[y] with Flashed = true }
+            newOctopuses <- Map.change point (fun o -> Option.map (fun oo -> { oo with Flashed = true }) o) newOctopuses
 
-            let neighbors = neighbors (x, y)
-            for nX, nY in neighbors do
-                newOctopuses.[nX].[nY] <- { newOctopuses.[nX].[nY] with EnergyLevel = newOctopuses.[nX].[nY].EnergyLevel + 1uy }
+            let neighbors = neighbors point
+            for neighbor in neighbors do
+                newOctopuses <- Map.change neighbor (fun o -> Option.map (fun oo -> { oo with EnergyLevel = oo.EnergyLevel + 1uy }) o) newOctopuses
 
-            for nX, nY in neighbors do
-                if newOctopuses.[nX].[nY].EnergyLevel > 9uy then
-                    flashOctopus (nX, nY)
+            for neighbor in neighbors do
+                if newOctopuses.[neighbor].EnergyLevel > 9uy then
+                    flashOctopus neighbor
 
-    for x in 0..maxX do
-        for y in 0..maxY do
-            if newOctopuses.[x].[y].EnergyLevel > 9uy then
-                flashOctopus (x, y)
+    for pair in newOctopuses do
+        if pair.Value.EnergyLevel > 9uy then
+            flashOctopus pair.Key
 
     newOctopuses
 
 let countFlashes octopuses =
     octopuses
-    |> mapAll (fun o -> if o.Flashed then 1 else 0)
-    |> Array.collect id
-    |> Array.sum
+    |> Map.map (fun _ o -> if o.Flashed then 1 else 0)
+    |> Map.values
+    |> Seq.sum
 
 let resetFlashedToZero =
-    mapAll (fun o -> if o.Flashed = false then o else { o with EnergyLevel = 0uy })
-
-let printState state cycle =
-    AnsiConsole.MarkupLine(sprintf $"After cycle %d{cycle}: ([bold]%d{state.FlashCount}[/] flashes)")
-
-    for row in state.Octopuses |> Array.transpose do
-        for octopus in row do
-            let format = if octopus.Flashed then "[bold]" else "[dim]"
-            AnsiConsole.Markup(sprintf $"%s{format}%d{octopus.EnergyLevel}[/]")
-        printfn ""
-
-    printfn ""
+    Map.map (fun _ o -> if o.Flashed = false then o else { o with EnergyLevel = 0uy })
 
 let cycle state _ =
     let flashedOctopuses = (incrementEnergyLevels >> flash) state.Octopuses
@@ -116,15 +111,13 @@ AnsiConsole.MarkupLine(sprintf $"After 100 cycles, there have been [bold]%d{stat
 
 let allOctopusesFlash octopuses =
     octopuses
-    |> mapAll (fun o -> o.Flashed)
-    |> Array.collect id
-    |> Array.forall id
+    |> Map.forall (fun _ o -> o.Flashed)
 
 let afterFirstTimeAllOctopusesFlash =
     allCycles
-    |> Seq.mapi (fun i s -> (i + 1, s))
+    |> Seq.indexed
     |> Seq.skipWhile (fun (_, s) -> not (allOctopusesFlash s.Octopuses))
     |> Seq.head
     |> fst
 
-AnsiConsole.MarkupLine(sprintf $"The first time all octopuses flash is in cycle [bold]%d{afterFirstTimeAllOctopusesFlash - 1}[/]")
+AnsiConsole.MarkupLine(sprintf $"The first time all octopuses flash is in cycle [bold]%d{afterFirstTimeAllOctopusesFlash}[/]")

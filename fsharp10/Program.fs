@@ -1,17 +1,15 @@
-open System.Collections.Immutable
-
 let input = Input.realInput
 
-let rec processLine l (s: ImmutableStack<char>) =
+let rec processLine l (s: char list) =
     if l = "" then
         (None, s)
     else
         let c = l.[0]
         match c with
-        | '(' | '[' | '<' | '{' -> processLine l.[1..] (s.Push c)
+        | '(' | '[' | '<' | '{' -> processLine l.[1..] ([c] @ s)
         | ')' | ']' | '>' | '}' ->
-            let mutable popped: char = ' '
-            let newStack = s.Pop &popped
+            let popped = List.head s
+            let newStack = List.tail s
 
             let isValid = match (popped, c) with
                           | '(', ')' -> true
@@ -27,7 +25,7 @@ let rec processLine l (s: ImmutableStack<char>) =
         | _ -> failwithf $"Unexpected character %c{c}"
 
 let getIllegalCharacter l: char option =
-    let illegalChar, _ = processLine l ImmutableStack<char>.Empty
+    let illegalChar, _ = processLine l []
     illegalChar
 
 let scoreIllegalCharacter c =
@@ -39,28 +37,19 @@ let scoreIllegalCharacter c =
     | _ -> failwithf $"Unexpected character %c{c}"
 
 let getCharactersToComplete l: char list option =
-    let rec getCharsFromStack (stack: ImmutableStack<char>) chars =
-        if stack.IsEmpty then
-            chars
-        else
-            let mutable popped: char = ' '
-            let newStack = stack.Pop &popped
+    let getCompletingCharacter c =
+        match c with
+        | '(' -> ')'
+        | '[' -> ']'
+        | '<' -> '>'
+        | '{' -> '}'
+        | _ -> failwithf $"Unexpected character %c{c}"
 
-            let completingCharacter =
-                match popped with
-                | '(' -> ')'
-                | '[' -> ']'
-                | '<' -> '>'
-                | '{' -> '}'
-                | _ -> failwithf $"Unexpected character %c{popped}"
-
-            getCharsFromStack newStack (chars @ [completingCharacter])
-
-    let illegalChar, stack = processLine l ImmutableStack<char>.Empty
+    let illegalChar, stack = processLine l []
 
     match illegalChar with
     | Some _ -> None
-    | None -> Some(getCharsFromStack stack [])
+    | None -> Some(List.rev stack |> List.map getCompletingCharacter)
 
 let illegalCharacters =
     input |> Array.choose getIllegalCharacter
