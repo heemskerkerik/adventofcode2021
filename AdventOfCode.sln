@@ -45,6 +45,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsharp20", "fsharp20\fsharp
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsharp21", "fsharp21\fsharp21.fsproj", "{0CC594FE-A90A-4A31-A00B-1A9B61564E87}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsharp22", "fsharp22\fsharp22.fsproj", "{B3E8A32F-85AB-4105-A325-A84F7DF2AB08}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -138,5 +140,9 @@ Global
 		{0CC594FE-A90A-4A31-A00B-1A9B61564E87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CC594FE-A90A-4A31-A00B-1A9B61564E87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CC594FE-A90A-4A31-A00B-1A9B61564E87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3E8A32F-85AB-4105-A325-A84F7DF2AB08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3E8A32F-85AB-4105-A325-A84F7DF2AB08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3E8A32F-85AB-4105-A325-A84F7DF2AB08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3E8A32F-85AB-4105-A325-A84F7DF2AB08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
